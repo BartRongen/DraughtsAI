@@ -10,3 +10,9 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/2ID90/assignment1/AICompetition/nbproject/private/
+/2ID90/assignment1/DraughtsPlugin/nbproject/private/
+/2ID90/assignment1/AICompetition/build/
+/2ID90/assignment1/AICompetition/dist/
+/2ID90/assignment1/DraughtsPlugin/build/
+/2ID90/assignment1/DraughtsPlugin/dist/
