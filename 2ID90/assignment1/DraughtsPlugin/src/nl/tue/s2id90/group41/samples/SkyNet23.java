@@ -1,5 +1,6 @@
-package nl.tue.s2id90.group41;
+package nl.tue.s2id90.group41.samples;
 
+import nl.tue.s2id90.group41.*;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
 import java.util.Collections;
@@ -14,14 +15,14 @@ import org10x10.dam.game.Move;
  */
 // ToDo: rename this class (and hence this file) to have a distinct name
 //       for your player during the tournament
-public class MyDraughtsPlayer  extends DraughtsPlayer{
+public class SkyNet23  extends DraughtsPlayer{
     private int bestValue=0;
     int maxSearchDepth;
     
     /** boolean that indicates that the GUI asked the player to stop thinking. */
     private boolean stopped;
 
-    public MyDraughtsPlayer(int maxSearchDepth) {
+    public SkyNet23(int maxSearchDepth) {
         super("best.png"); // ToDo: replace with your own icon
         this.maxSearchDepth = maxSearchDepth;
     }
@@ -116,8 +117,25 @@ public class MyDraughtsPlayer  extends DraughtsPlayer{
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
         // ToDo: write an alphabeta search to compute bestMove and value
-        Move bestMove = state.getMoves().get(0);
-        int value = 0;
+        Move bestMove = null;
+        int value = MAX_VALUE;
+        
+        if (depth == 0){
+            return evaluate(node.getState());
+        }
+        List<Move> moves = state.getMoves();
+        for (Move move : moves){
+            state.doMove(move);
+            value = Math.min(value, alphaBeta(node, alpha, beta, depth - 1));
+            state.undoMove(move);
+            if (value < beta){
+                bestMove = move;
+                beta = value;
+            }
+            if (alpha >= beta){
+                break;
+            }
+        }
         node.setBestMove(bestMove);
         return value;
      }
@@ -127,13 +145,47 @@ public class MyDraughtsPlayer  extends DraughtsPlayer{
         if (stopped) { stopped = false; throw new AIStoppedException(); }
         DraughtsState state = node.getState();
         // ToDo: write an alphabeta search to compute bestMove and value
-        Move bestMove = state.getMoves().get(0);
-        int value = 0;
+        Move bestMove = null;
+        int value = MIN_VALUE;
+        
+        if (depth == 0){
+            return evaluate(node.getState());
+        }
+        List<Move> moves = state.getMoves();
+        for (Move move : moves){
+            state.doMove(move);
+            value = Math.max(value, alphaBeta(node, alpha, beta, depth - 1));
+            state.undoMove(move);
+            if (value > alpha){
+                bestMove = move;
+                alpha = value;
+            }
+            if (alpha >= beta){
+                break;
+            }
+        }
         node.setBestMove(bestMove);
         return value;
     }
 
     /** A method that evaluates the given state. */
     // ToDo: write an appropriate evaluation function
-    int evaluate(DraughtsState state) { return 0; }
+    int evaluate(DraughtsState state) {
+        int value = 0;
+        int[] pieces = state.getPieces();
+        for (int i = 0; i < pieces.length; i++){
+            switch (pieces[i]){
+                case 1: value++; //WHITEPIECE
+                        break;
+                case 2: value--; //BLACKPIECE
+                        break;
+                case 3: value += 3; //WHITEKING
+                        break;
+                case 4: value -= 3; //BLACKKING
+                        break;
+                default: break; //NO PIECE
+            }
+        }
+        return value;
+    }
 }
