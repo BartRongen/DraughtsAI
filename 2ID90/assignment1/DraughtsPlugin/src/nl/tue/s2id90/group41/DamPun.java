@@ -32,7 +32,7 @@ public class DamPun  extends DraughtsPlayer{
         DraughtsNode node = new DraughtsNode(s);    // the root of the search tree
         try {
             int i = 1;
-            // We use iterative deepening to find best move.
+            // We use iterative deepening to find the best move at depth i.
             while(i<=maxSearchDepth) { 
                 // compute bestMove and bestValue in a call to alphabeta
                 bestValue = alphaBeta(node, MIN_VALUE, MAX_VALUE, i);
