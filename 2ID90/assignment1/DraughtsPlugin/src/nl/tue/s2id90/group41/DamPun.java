@@ -119,7 +119,7 @@ public class DamPun  extends DraughtsPlayer{
         Move bestMove = null;
         int value = MAX_VALUE;
         
-        if (depth == 0){
+        if (depth == 0  || state.isEndState()){
             return evaluate(node.getState());
         }
         List<Move> moves = state.getMoves();
@@ -147,7 +147,7 @@ public class DamPun  extends DraughtsPlayer{
         Move bestMove = null;
         int value = MIN_VALUE;
         
-        if (depth == 0){
+        if (depth == 0 || state.isEndState()){
             return evaluate(node.getState());
         }
         List<Move> moves = state.getMoves();
