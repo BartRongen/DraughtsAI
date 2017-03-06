@@ -171,20 +171,51 @@ public class DamPun  extends DraughtsPlayer{
     // ToDo: write an appropriate evaluation function
     int evaluate(DraughtsState state) {
         int value = 0;
+        int pieceValue = 10; //high values so that it's still the most
+        int kingValue = 30;  //determining factor
         int[] pieces = state.getPieces();
-        for (int i = 0; i < pieces.length; i++){
+        for (int i = 1; i < pieces.length; i++){
             switch (pieces[i]){
-                case 1: value++; //WHITEPIECE
+                case 1: value += pieceValue; //WHITEPIECE
+                        value += position(true, i, false); //position evaluation
                         break;
-                case 2: value--; //BLACKPIECE
+                case 2: value -= pieceValue; //BLACKPIECE
+                        value -= position(false, i, false); //position evaluation
                         break;
-                case 3: value += 3; //WHITEKING
+                case 3: value += kingValue; //WHITEKING
+                        value += position(true, i, true); //position evaluation
                         break;
-                case 4: value -= 3; //BLACKKING
+                case 4: value -= kingValue; //BLACKKING
+                        value -= position(false, i, true); //position evaluation
                         break;
                 default: break; //NO PIECE
             }
         }
+        return value;
+    }
+    
+    //gives an evaluation for the position of the piece
+    private int position(boolean white, int i, boolean king){
+        int value = 0; //initial value is 0;
+        int sidePieceReduction = 2;
+        
+        if (white){
+            //king shouldn't have a tempo value
+            if (!king){
+                value += 10 - (i/5); // tempo value
+            }
+        } else {
+            //king shouldn't have a tempo value
+            if (!king){
+                value += i/5; // tempo value
+            }
+        }
+        
+        //sidepieces are not preferable
+        if (i % 5 == 0 || i % 5 == 1){
+                value -= sidePieceReduction;
+        }
+        
         return value;
     }
 }
