@@ -194,20 +194,20 @@ public class DamPun  extends DraughtsPlayer{
         return value;
     }
     
-    //gives an evaluation for the position of the piece
+    //gives an evaluation for the position of the piece, range (0-9);
     private int position(boolean white, int i, boolean king){
         int value = 0; //initial value is 0;
-        int sidePieceReduction = 2;
+        int sidePieceReduction = 3;
         
         if (white){
             //king shouldn't have a tempo value
             if (!king){
-                value += 10 - (i/5); // tempo value
+                value += 9 - ((i - 1)/5); // tempo value
             }
         } else {
             //king shouldn't have a tempo value
             if (!king){
-                value += i/5; // tempo value
+                value += (i - 1)/5; // tempo value
             }
         }
         
