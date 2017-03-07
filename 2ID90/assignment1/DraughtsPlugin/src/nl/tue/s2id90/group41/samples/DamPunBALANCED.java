@@ -1,5 +1,6 @@
-package nl.tue.s2id90.group41;
+package nl.tue.s2id90.group41.samples;
 
+import nl.tue.s2id90.group41.*;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.MIN_VALUE;
 import java.util.Collections;
@@ -14,15 +15,14 @@ import org10x10.dam.game.Move;
  */
 // ToDo: rename this class (and hence this file) to have a distinct name
 //       for your player during the tournament
-public class DamPun  extends DraughtsPlayer{
+public class DamPunBALANCED  extends DraughtsPlayer{
     private int bestValue=0;
     int maxSearchDepth;
-    private int tempBest = 0;
     
     /** boolean that indicates that the GUI asked the player to stop thinking. */
     private boolean stopped;
 
-    public DamPun(int maxSearchDepth) {
+    public DamPunBALANCED(int maxSearchDepth) {
         super("best.png"); // ToDo: replace with your own icon
         this.maxSearchDepth = maxSearchDepth;
     }
@@ -37,6 +37,7 @@ public class DamPun  extends DraughtsPlayer{
             while(i<=maxSearchDepth) { 
                 // compute bestMove and bestValue in a call to alphabeta
                 bestValue = alphaBeta(node, MIN_VALUE, MAX_VALUE, i);
+            
                 // store the bestMove found uptill now
                 // NB this is not done in case of an AIStoppedException in alphaBeat()
                 bestMove  = node.getBestMove();
@@ -92,11 +93,11 @@ public class DamPun  extends DraughtsPlayer{
     int alphaBeta(DraughtsNode node, int alpha, int beta, int depth)
             throws AIStoppedException
     {
-            if (node.getState().isWhiteToMove()) {
-                return alphaBetaMax(node, alpha, beta, depth);
-            } else  {
-                return alphaBetaMin(node, alpha, beta, depth);
-            }
+        if (node.getState().isWhiteToMove()) {
+            return alphaBetaMax(node, alpha, beta, depth);
+        } else  {
+            return alphaBetaMin(node, alpha, beta, depth);
+        }
     }
     
     /** Does an alphabeta computation with the given alpha and beta
@@ -157,7 +158,9 @@ public class DamPun  extends DraughtsPlayer{
         }
         List<Move> moves = state.getMoves();
         for (Move move : moves){
-            
+            if (move.isCapture()) { // As the current move is a capture move
+                depth++;            // we increase the depth by 1, to increase
+            }                       // our search depth. (flexible depth)
             state.doMove(move);
             value = Math.max(value, alphaBeta(node, alpha, beta, depth - 1));
             state.undoMove(move);
@@ -177,8 +180,8 @@ public class DamPun  extends DraughtsPlayer{
     // ToDo: write an appropriate evaluation function
     int evaluate(DraughtsState state) {
         int value = 0;
-        int pieceValue = 20; //high values so that it's still the most
-        int kingValue = 60;  //determining factor
+        int pieceValue = 10; //high values so that it's still the most
+        int kingValue = 30;  //determining factor
         
         //initial balance values
         int whiteBalance = 0;
@@ -189,12 +192,10 @@ public class DamPun  extends DraughtsPlayer{
             switch (pieces[i]){
                 case 1: value += pieceValue; //WHITEPIECE
                         value += position(true, i, false); //position evaluation
-                        value += formation(pieces, i, true);
                         whiteBalance += balance(i);
                         break;
                 case 2: value -= pieceValue; //BLACKPIECE
                         value -= position(false, i, false); //position evaluation
-                        value -= formation(pieces, i, false);
                         blackBalance += balance(i);
                         break;
                 case 3: value += kingValue; //WHITEKING
@@ -218,17 +219,17 @@ public class DamPun  extends DraughtsPlayer{
     //gives an evaluation for the position of the piece, range (0-9);
     private int position(boolean white, int i, boolean king){
         int value = 0; //initial value is 0;
-        int sidePieceReduction = 6;
+        int sidePieceReduction = 3;
         
         if (white){
             //king shouldn't have a tempo value
             if (!king){
-                value += 2* (9 - ((i - 1)/5)); // tempo value
+                value += 9 - ((i - 1)/5); // tempo value
             }
         } else {
             //king shouldn't have a tempo value
             if (!king){
-                value += 2* ((i - 1)/5); // tempo value
+                value += (i - 1)/5; // tempo value
             }
         }
         
@@ -244,39 +245,11 @@ public class DamPun  extends DraughtsPlayer{
     //righthand-side and 0 in the middle
     private int balance(int i){
         if (i % 5 <= 2){
-            return 2;
+            return 1;
         } else if (i % 5 >= 4){
-            return -2;
+            return -1;
         } else {
             return 0;
         }
-    }
-    
-    private int formation(int[] pieces, int i, boolean white) {
-        int value = 0;
-        if (white) {    // White pieces
-            if (i>6&&i%5!=1) {
-                if (pieces[i-6] == 1) { // Piece has a white right neighbour
-                    value++;
-                }
-            }
-            if (i>5&&i%5!=0) {
-                if (pieces[i-5] == 1 && value<2) { // Piece has a white left neighbour
-                    value++;
-                }
-            }
-        } else {    //Black pieces
-            if (i<46&&i%5!=1) {    
-                if (pieces[i+5] == 2) { // Piece has a black left neighbour
-                    value++;
-                }
-            }
-            if (i<45&&i%5!=0) {
-                if (pieces[i+6] == 2 && value<2) { // Piece has a black right neighbour
-                    value++;
-                }
-            }
-        }
-        return value;
     }
 }
