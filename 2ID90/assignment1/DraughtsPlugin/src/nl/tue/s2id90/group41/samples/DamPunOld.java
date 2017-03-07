@@ -15,14 +15,14 @@ import org10x10.dam.game.Move;
  */
 // ToDo: rename this class (and hence this file) to have a distinct name
 //       for your player during the tournament
-public class SkyNet23  extends DraughtsPlayer{
+public class DamPunOld  extends DraughtsPlayer{
     private int bestValue=0;
     int maxSearchDepth;
     
     /** boolean that indicates that the GUI asked the player to stop thinking. */
     private boolean stopped;
 
-    public SkyNet23(int maxSearchDepth) {
+    public DamPunOld(int maxSearchDepth) {
         super("best.png"); // ToDo: replace with your own icon
         this.maxSearchDepth = maxSearchDepth;
     }
@@ -125,7 +125,7 @@ public class SkyNet23  extends DraughtsPlayer{
         Move bestMove = null;
         int value = MAX_VALUE;
         
-        if (depth == 0){
+        if (depth == 0  || state.isEndState()){
             return evaluate(node.getState());
         }
         List<Move> moves = state.getMoves();
@@ -153,7 +153,7 @@ public class SkyNet23  extends DraughtsPlayer{
         Move bestMove = null;
         int value = MIN_VALUE;
         
-        if (depth == 0){
+        if (depth == 0 || state.isEndState()){
             return evaluate(node.getState());
         }
         List<Move> moves = state.getMoves();
@@ -177,20 +177,51 @@ public class SkyNet23  extends DraughtsPlayer{
     // ToDo: write an appropriate evaluation function
     int evaluate(DraughtsState state) {
         int value = 0;
+        int pieceValue = 10; //high values so that it's still the most
+        int kingValue = 30;  //determining factor
         int[] pieces = state.getPieces();
-        for (int i = 0; i < pieces.length; i++){
+        for (int i = 1; i < pieces.length; i++){
             switch (pieces[i]){
-                case 1: value++; //WHITEPIECE
+                case 1: value += pieceValue; //WHITEPIECE
+                        value += position(true, i, false); //position evaluation
                         break;
-                case 2: value--; //BLACKPIECE
+                case 2: value -= pieceValue; //BLACKPIECE
+                        value -= position(false, i, false); //position evaluation
                         break;
-                case 3: value += 3; //WHITEKING
+                case 3: value += kingValue; //WHITEKING
+                        value += position(true, i, true); //position evaluation
                         break;
-                case 4: value -= 3; //BLACKKING
+                case 4: value -= kingValue; //BLACKKING
+                        value -= position(false, i, true); //position evaluation
                         break;
                 default: break; //NO PIECE
             }
         }
+        return value;
+    }
+    
+    //gives an evaluation for the position of the piece, range (0-9);
+    private int position(boolean white, int i, boolean king){
+        int value = 0; //initial value is 0;
+        int sidePieceReduction = 3;
+        
+        if (white){
+            //king shouldn't have a tempo value
+            if (!king){
+                value += 9 - ((i - 1)/5); // tempo value
+            }
+        } else {
+            //king shouldn't have a tempo value
+            if (!king){
+                value += (i - 1)/5; // tempo value
+            }
+        }
+        
+        //sidepieces are not preferable
+        if (i % 5 == 0 || i % 5 == 1){
+                value -= sidePieceReduction;
+        }
+        
         return value;
     }
 }

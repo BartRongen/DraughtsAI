@@ -6,6 +6,7 @@ import nl.tue.s2id90.group41.samples.BuggyPlayer;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import nl.tue.s2id90.draughts.DraughtsPlayerProvider;
 import nl.tue.s2id90.draughts.DraughtsPlugin;
+import nl.tue.s2id90.group41.samples.DamPunOld;
 import nl.tue.s2id90.group41.samples.SkyNet23;
 
 
@@ -21,11 +22,12 @@ public class MyDraughtsPlugin extends DraughtsPlayerProvider implements Draughts
         // During the final competition you should make only your 
         // best player available. For testing it might be handy
         // to make more than one player available.
-        super(new DamPun(5),
+        super(new DamPun(15),
                 new UninformedPlayer(),
                 new OptimisticPlayer(),
                 new BuggyPlayer(),
-                new SkyNet23(5)
+                new SkyNet23(15),
+                new DamPunOld(15)
         );
     }
 }

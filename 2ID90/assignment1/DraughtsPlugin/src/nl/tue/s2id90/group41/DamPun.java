@@ -178,24 +178,37 @@ public class DamPun  extends DraughtsPlayer{
         int value = 0;
         int pieceValue = 10; //high values so that it's still the most
         int kingValue = 30;  //determining factor
+        
+        //initial balance values
+        int whiteBalance = 0;
+        int blackBalance = 0;
+        
         int[] pieces = state.getPieces();
         for (int i = 1; i < pieces.length; i++){
             switch (pieces[i]){
                 case 1: value += pieceValue; //WHITEPIECE
                         value += position(true, i, false); //position evaluation
+                        whiteBalance += balance(i);
                         break;
                 case 2: value -= pieceValue; //BLACKPIECE
                         value -= position(false, i, false); //position evaluation
+                        blackBalance += balance(i);
                         break;
                 case 3: value += kingValue; //WHITEKING
                         value += position(true, i, true); //position evaluation
+                        whiteBalance += balance(i);
                         break;
                 case 4: value -= kingValue; //BLACKKING
                         value -= position(false, i, true); //position evaluation
+                        blackBalance += balance(i);
                         break;
                 default: break; //NO PIECE
             }
         }
+        //handles balance
+        value -= Math.abs(whiteBalance);
+        value += Math.abs(blackBalance);
+        
         return value;
     }
     
@@ -222,5 +235,17 @@ public class DamPun  extends DraughtsPlayer{
         }
         
         return value;
+    }
+    
+    //Returns 1 if a piece is on the lefthand-side of the board, -1 on the 
+    //righthand-side and 0 in the middle
+    private int balance(int i){
+        if (i % 5 <= 2){
+            return 1;
+        } else if (i % 5 >= 4){
+            return -1;
+        } else {
+            return 0;
+        }
     }
 }
