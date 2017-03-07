@@ -129,6 +129,9 @@ public class DamPun  extends DraughtsPlayer{
         }
         List<Move> moves = state.getMoves();
         for (Move move : moves){
+            if (move.isCapture()) { // As the current move is a capture move
+                depth++;            // we increase the depth by 1, to increase
+            }                       // our search depth. (flexible depth)
             state.doMove(move);
             value = Math.min(value, alphaBeta(node, alpha, beta, depth - 1));
             state.undoMove(move);
@@ -157,6 +160,9 @@ public class DamPun  extends DraughtsPlayer{
         }
         List<Move> moves = state.getMoves();
         for (Move move : moves){
+            if (move.isCapture()) { // As the current move is a capture move
+                depth++;            // we increase the depth by 1, to increase
+            }                       // our search depth. (flexible depth)
             state.doMove(move);
             value = Math.max(value, alphaBeta(node, alpha, beta, depth - 1));
             state.undoMove(move);
