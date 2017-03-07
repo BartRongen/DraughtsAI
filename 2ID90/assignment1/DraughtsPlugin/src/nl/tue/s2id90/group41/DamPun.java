@@ -17,6 +17,7 @@ import org10x10.dam.game.Move;
 public class DamPun  extends DraughtsPlayer{
     private int bestValue=0;
     int maxSearchDepth;
+    private int tempBest = 0;
     
     /** boolean that indicates that the GUI asked the player to stop thinking. */
     private boolean stopped;
@@ -36,7 +37,6 @@ public class DamPun  extends DraughtsPlayer{
             while(i<=maxSearchDepth) { 
                 // compute bestMove and bestValue in a call to alphabeta
                 bestValue = alphaBeta(node, MIN_VALUE, MAX_VALUE, i);
-            
                 // store the bestMove found uptill now
                 // NB this is not done in case of an AIStoppedException in alphaBeat()
                 bestMove  = node.getBestMove();
@@ -92,11 +92,11 @@ public class DamPun  extends DraughtsPlayer{
     int alphaBeta(DraughtsNode node, int alpha, int beta, int depth)
             throws AIStoppedException
     {
-        if (node.getState().isWhiteToMove()) {
-            return alphaBetaMax(node, alpha, beta, depth);
-        } else  {
-            return alphaBetaMin(node, alpha, beta, depth);
-        }
+            if (node.getState().isWhiteToMove()) {
+                return alphaBetaMax(node, alpha, beta, depth);
+            } else  {
+                return alphaBetaMin(node, alpha, beta, depth);
+            }
     }
     
     /** Does an alphabeta computation with the given alpha and beta
@@ -129,9 +129,6 @@ public class DamPun  extends DraughtsPlayer{
         }
         List<Move> moves = state.getMoves();
         for (Move move : moves){
-            if (move.isCapture()) { // As the current move is a capture move
-                depth++;            // we increase the depth by 1, to increase
-            }                       // our search depth. (flexible depth)
             state.doMove(move);
             value = Math.min(value, alphaBeta(node, alpha, beta, depth - 1));
             state.undoMove(move);
@@ -160,9 +157,7 @@ public class DamPun  extends DraughtsPlayer{
         }
         List<Move> moves = state.getMoves();
         for (Move move : moves){
-            if (move.isCapture()) { // As the current move is a capture move
-                depth++;            // we increase the depth by 1, to increase
-            }                       // our search depth. (flexible depth)
+            
             state.doMove(move);
             value = Math.max(value, alphaBeta(node, alpha, beta, depth - 1));
             state.undoMove(move);
@@ -194,10 +189,12 @@ public class DamPun  extends DraughtsPlayer{
             switch (pieces[i]){
                 case 1: value += pieceValue; //WHITEPIECE
                         value += position(true, i, false); //position evaluation
+                        value += formation(pieces, i, true);
                         whiteBalance += balance(i);
                         break;
                 case 2: value -= pieceValue; //BLACKPIECE
                         value -= position(false, i, false); //position evaluation
+                        value -= formation(pieces, i, false);
                         blackBalance += balance(i);
                         break;
                 case 3: value += kingValue; //WHITEKING
@@ -253,5 +250,33 @@ public class DamPun  extends DraughtsPlayer{
         } else {
             return 0;
         }
+    }
+    
+    private int formation(int[] pieces, int i, boolean white) {
+        int value = 0;
+        if (white) {    // White pieces
+            if (i>6&&i%5!=1) {
+                if (pieces[i-6] == 1) { // Piece has a white right neighbour
+                    value++;
+                }
+            }
+            if (i>5&&i%5!=0) {
+                if (pieces[i-5] == 1 && value<2) { // Piece has a white left neighbour
+                    value++;
+                }
+            }
+        } else {    //Black pieces
+            if (i<46&&i%5!=1) {    
+                if (pieces[i+5] == 2) { // Piece has a black left neighbour
+                    value++;
+                }
+            }
+            if (i<45&&i%5!=0) {
+                if (pieces[i+6] == 2 && value<2) { // Piece has a black right neighbour
+                    value++;
+                }
+            }
+        }
+        return value;
     }
 }
